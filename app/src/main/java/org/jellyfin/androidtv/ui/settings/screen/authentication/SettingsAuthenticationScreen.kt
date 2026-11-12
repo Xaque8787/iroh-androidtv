@@ -95,7 +95,7 @@ fun SettingsAuthenticationScreen(launchedFromLogin: Boolean = false) {
 				ListButton(
 					leadingContent = { Icon(painterResource(R.drawable.ic_house), contentDescription = null) },
 					headingContent = { Text(server.name) },
-					captionContent = { Text(server.address) },
+					captionContent = { Text(server.displayAddress) },
 					onClick = {
 						router.push(
 							route = Routes.AUTHENTICATION_SERVER,

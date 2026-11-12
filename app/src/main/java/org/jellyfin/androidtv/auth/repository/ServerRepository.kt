@@ -1,5 +1,9 @@
 package org.jellyfin.androidtv.auth.repository
 
+import io.github.xaque8787.iroh.IrohException
+import java.time.Instant
+import java.util.UUID
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,10 +16,12 @@ import kotlinx.coroutines.withContext
 import org.jellyfin.androidtv.auth.model.AuthenticationStoreServer
 import org.jellyfin.androidtv.auth.model.ConnectedState
 import org.jellyfin.androidtv.auth.model.ConnectingState
+import org.jellyfin.androidtv.auth.model.IrohConnectionError
 import org.jellyfin.androidtv.auth.model.Server
 import org.jellyfin.androidtv.auth.model.ServerAdditionState
 import org.jellyfin.androidtv.auth.model.UnableToConnectState
 import org.jellyfin.androidtv.auth.store.AuthenticationStore
+import org.jellyfin.androidtv.iroh.IrohTransport
 import org.jellyfin.androidtv.util.sdk.toServer
 import org.jellyfin.sdk.Jellyfin
 import org.jellyfin.sdk.api.client.ApiClient
@@ -30,8 +36,6 @@ import org.jellyfin.sdk.model.api.BrandingOptionsDto
 import org.jellyfin.sdk.model.api.ServerDiscoveryInfo
 import org.jellyfin.sdk.model.serializer.toUUID
 import timber.log.Timber
-import java.time.Instant
-import java.util.UUID
 
 /**
  * Repository to maintain servers.
@@ -62,6 +66,7 @@ interface ServerRepository {
 class ServerRepositoryImpl(
 	private val jellyfin: Jellyfin,
 	private val authenticationStore: AuthenticationStore,
+	private val iroh: IrohTransport,
 ) : ServerRepository {
 	// State
 	private val _storedServers = MutableStateFlow(emptyList<Server>())
@@ -99,7 +104,41 @@ class ServerRepositoryImpl(
 
 	// Mutating data
 	override fun addServer(address: String): Flow<ServerAdditionState> = flow {
-		Timber.i("Adding server %s", address)
+		if (IrohTransport.isInvite(address) || address == IrohTransport.ADDRESS) {
+			emit(ConnectingState("Iroh"))
+			try {
+				check(!IrohTransport.isInvite(address) || authenticationStore.getServers().values.none { it.address == IrohTransport.ADDRESS }) {
+					"Remove the saved Iroh server before pairing another invitation."
+				}
+				if (IrohTransport.isInvite(address)) iroh.pair(address)
+				val api = jellyfin.createApi(IrohTransport.ADDRESS)
+				val info = api.systemApi.getPublicSystemInfo().content
+				val branding = api.getBrandingOptionsOrDefault()
+				val id = info.id!!.toUUID()
+				check(authenticationStore.putServer(id, AuthenticationStoreServer(
+					name = info.serverName ?: "Iroh Jellyfin",
+					address = IrohTransport.ADDRESS,
+					version = info.version,
+					loginDisclaimer = branding.loginDisclaimer,
+					splashscreenEnabled = branding.splashscreenEnabled,
+					setupCompleted = info.startupWizardCompleted ?: true,
+					users = authenticationStore.getServer(id)?.users.orEmpty(),
+				))) { "Could not save Iroh server" }
+				loadStoredServers()
+				emit(ConnectedState(id, info))
+			} catch (error: CancellationException) {
+				throw error
+			} catch (error: Exception) {
+				val message = when (error) {
+					is IrohException -> "Iroh: ${error.code}. Check the host or obtain a fresh invitation."
+					is IllegalStateException -> error.message ?: "Iroh connection failed"
+					else -> "Iroh could not reach Jellyfin. Check connectivity; your pairing is retained."
+				}
+				emit(IrohConnectionError(message))
+			}
+			return@flow
+		}
+		Timber.i("Adding HTTP server")
 
 		emit(ConnectingState(address))
 
@@ -237,7 +276,9 @@ class ServerRepositoryImpl(
 	}
 
 	override suspend fun deleteServer(server: UUID): Boolean {
+		val wasIroh = authenticationStore.getServer(server)?.address == IrohTransport.ADDRESS
 		val success = authenticationStore.removeServer(server)
+		if (success && wasIroh) iroh.forget()
 		if (success) loadStoredServers()
 		return success
 	}

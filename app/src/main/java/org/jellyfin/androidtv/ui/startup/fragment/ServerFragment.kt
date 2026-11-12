@@ -136,7 +136,7 @@ class ServerFragment : Fragment() {
 		binding.serverButton.apply {
 			state = ServerButtonView.State.EDIT
 			name = server.name
-			address = server.address
+			address = server.displayAddress
 			version = server.version
 		}
 

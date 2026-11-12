@@ -7,3 +7,7 @@ local.properties
 .kotlin/
 build/
 captures/
+
+# Downloaded, checksum-pinned Iroh SDK
+/app/libs/*.aar
+/app/libs/*.tmp

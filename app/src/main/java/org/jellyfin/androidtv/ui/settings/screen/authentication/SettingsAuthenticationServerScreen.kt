@@ -59,7 +59,7 @@ fun SettingsAuthenticationServerScreen(serverId: UUID) {
 			ListSection(
 				overlineContent = { Text(stringResource(R.string.pref_login).uppercase()) },
 				headingContent = { Text(server?.name.orEmpty()) },
-				captionContent = { Text(server?.address.orEmpty()) },
+				captionContent = { Text(server?.displayAddress.orEmpty()) },
 			)
 		}
 

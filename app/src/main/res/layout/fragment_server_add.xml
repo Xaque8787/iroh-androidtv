@@ -34,7 +34,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="@string/lbl_valid_server_address"
+        android:text="@string/iroh_server_hint"
         app:layout_constraintEnd_toStartOf="@id/center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title" />
@@ -47,6 +47,7 @@
         android:layout_marginTop="8dp"
         android:imeOptions="actionDone"
         android:inputType="textUri"
+        android:saveEnabled="false"
         android:nextFocusDown="@id/confirm"
         android:nextFocusForward="@id/confirm"
         android:privateImeOptions="horizontalAlignment=right"
@@ -64,6 +65,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/address" />
 
+    <Button
+        android:id="@+id/iroh_resume"
+        style="@style/Button.Default"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/iroh_resume"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/confirm" />
+
     <TextView
         android:id="@+id/error"
         android:layout_width="0dp"
@@ -71,6 +82,6 @@
         android:layout_marginTop="16dp"
         app:layout_constraintEnd_toStartOf="@id/center"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/confirm"
+        app:layout_constraintTop_toBottomOf="@id/iroh_resume"
         tools:text="@string/server_connecting" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,7 +8,11 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.media3.datasource.HttpDataSource
 import androidx.media3.datasource.okhttp.OkHttpDataSource
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import org.jellyfin.androidtv.R
+import org.jellyfin.androidtv.auth.repository.ServerRepository
+import org.jellyfin.androidtv.iroh.IrohTransport
 import org.jellyfin.androidtv.preference.UserPreferences
 import org.jellyfin.androidtv.preference.UserSettingPreferences
 import org.jellyfin.androidtv.preference.constant.BufferLength
@@ -31,8 +35,6 @@ import org.jellyfin.sdk.model.api.MediaSegmentType
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import org.jellyfin.androidtv.ui.playback.PlaybackManager as LegacyPlaybackManager
 
 val playbackModule = module {
@@ -40,7 +42,7 @@ val playbackModule = module {
 	single { VideoQueueManager() }
 	single<MediaManager> { RewriteMediaManager(get(), get()) }
 
-	single { PlaybackLauncher(get(), get(), get(), get()) }
+	single { PlaybackLauncher(get(), get(), get(), get(), get()) }
 
 	single<HttpDataSource.Factory> {
 		val okHttpFactory = get<OkHttpFactory>()
@@ -49,7 +51,12 @@ val playbackModule = module {
 			requestTimeout = Duration.ZERO
 		)
 
-		OkHttpDataSource.Factory(okHttpFactory.createClient(httpClientOptions))
+		val transport = get<IrohTransport>()
+		val servers = get<ServerRepository>()
+		OkHttpDataSource.Factory(okHttpFactory.createClient(httpClientOptions).newBuilder().apply { interceptors().clear() }
+			.addInterceptor(transport.interceptor(media = true) {
+				servers.currentServer.value?.address == IrohTransport.ADDRESS
+			}).build())
 	}
 
 	single { createPlaybackManager() }

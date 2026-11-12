@@ -18,6 +18,8 @@ data class Server(
 	val setupCompleted: Boolean = true,
 	var dateLastAccessed: Instant = Instant.MIN,
 ) {
+	val displayAddress get() = if (address == org.jellyfin.androidtv.iroh.IrohTransport.ADDRESS) "Iroh" else address
+
 	val serverVersion = version?.let(ServerVersion::fromString)
 	val versionSupported = serverVersion != null && serverVersion >= ServerRepository.minimumServerVersion
 

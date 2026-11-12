@@ -15,11 +15,14 @@ import kotlinx.coroutines.flow.onEach
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.auth.model.ConnectedState
 import org.jellyfin.androidtv.auth.model.ConnectingState
+import org.jellyfin.androidtv.auth.model.IrohConnectionError
 import org.jellyfin.androidtv.auth.model.UnableToConnectState
 import org.jellyfin.androidtv.databinding.FragmentServerAddBinding
+import org.jellyfin.androidtv.iroh.IrohTransport
 import org.jellyfin.androidtv.ui.startup.ServerAddViewModel
 import org.jellyfin.androidtv.util.createBundle
 import org.jellyfin.androidtv.util.getSummary
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ServerAddFragment : Fragment() {
@@ -27,6 +30,7 @@ class ServerAddFragment : Fragment() {
 		const val ARG_SERVER_ADDRESS = "server_address"
 	}
 
+	private val iroh: IrohTransport by inject()
 	private val startupViewModel: ServerAddViewModel by viewModel()
 	private var _binding: FragmentServerAddBinding? = null
 	private val binding get() = _binding!!
@@ -67,7 +71,12 @@ class ServerAddFragment : Fragment() {
 			binding.address.requestFocus()
 		}
 
+		binding.irohResume.setOnClickListener { startupViewModel.addServer(IrohTransport.ADDRESS) }
+		binding.irohResume.visibility = if (iroh.hasSavedPairing) View.VISIBLE else View.GONE
+
 		startupViewModel.state.onEach { state ->
+			binding.irohResume.isEnabled = state !is ConnectingState
+			binding.irohResume.visibility = if (iroh.hasSavedPairing) View.VISIBLE else View.GONE
 			when (state) {
 				is ConnectingState -> {
 					// Disable form
@@ -88,6 +97,12 @@ class ServerAddFragment : Fragment() {
 							.map { "${it.key} - ${it.value.getSummary(requireContext())}" }
 							.joinToString(prefix = "\n", separator = "\n")
 					)
+				}
+
+				is IrohConnectionError -> {
+					binding.address.isEnabled = true
+					binding.confirm.isEnabled = true
+					binding.error.text = state.message
 				}
 
 				is ConnectedState -> parentFragmentManager.commit {

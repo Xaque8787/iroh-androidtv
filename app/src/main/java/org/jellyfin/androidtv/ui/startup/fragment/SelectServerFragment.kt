@@ -239,7 +239,7 @@ class SelectServerFragment : Fragment() {
 
 			// Set data
 			name = server.name
-			address = server.address
+			address = server.displayAddress
 			version = server.version
 
 			state = when (serverState) {
