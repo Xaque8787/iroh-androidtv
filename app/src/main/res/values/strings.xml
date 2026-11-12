@@ -701,4 +701,7 @@
     <string name="truehd_atmos">TrueHD Atmos</string>
     <string name="iroh_server_hint">HTTP(S) address or jellyfin-iroh://invite/… link</string>
     <string name="iroh_resume">Connect using saved Iroh pairing</string>
+    <string name="iroh_server_title">Enter server URL or Iroh invite</string>
+    <string name="iroh_connect_action">Connect with server URL or Iroh invite</string>
+    <string name="iroh_build_identity">Iroh beta · SDK 0.4.0 · build %1$s</string>
 </resources>

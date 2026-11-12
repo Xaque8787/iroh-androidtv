@@ -10,7 +10,7 @@ application ID is `io.github.xaque8787.iroh.androidtv.debug`, and the launcher n
 
 In GitHub Actions, select **App / Build → Run workflow** on the branch containing
 this integration. It runs unit tests, assembles a debug APK, and uploads the
-`iroh-androidtv-debug` artifact (14-day retention). APK builds are manual; existing
+`iroh-androidtv-debug-<source commit>` artifact (14-day retention). APK builds are manual; existing
 lint and test workflows remain automatic. No release signing secrets are needed.
 CI debug signing keys can differ between runs: if Android rejects an update with
 a signature mismatch, uninstall the previous test app first (this deletes its
@@ -93,3 +93,20 @@ older actionlint does not yet recognize).
 No Android device/emulator was connected. Native pairing, actual Jellyfin login,
 TV UI behavior and real playback remain device acceptance checks; the unit tests
 do not establish those. The GitHub Actions workflow has not been run remotely.
+
+## Identifying the installed beta
+
+Start a new **Run workflow** on `master`; re-running an old workflow run keeps its
+original commit. The artifact name includes the full source SHA and its
+`BUILD-INFO.txt` records the source ref, commit, SDK version, app ID and APK checksum.
+Open **Connect with server URL or Iroh invite** in the app: the screen must say
+**Enter server URL or Iroh invite** and **Iroh beta · SDK 0.4.0 · build <12-char SHA>**.
+The launcher name remains **Iroh Jellyfin TV (debug)**. Build markers show `local`
+when building outside GitHub Actions without `GITHUB_SHA`.
+
+The original Iroh commit `ed2985960` already included the smaller hint
+**HTTP(S) address or jellyfin-iroh://invite/… link** below the generic server title.
+No hint and no Iroh launcher label indicate a different/older APK or app. A newer
+build now identifies the failed stage and a safe error type, so record that text
+without sharing the invitation link. A failed connection alone does not establish
+that the wrong APK was installed.

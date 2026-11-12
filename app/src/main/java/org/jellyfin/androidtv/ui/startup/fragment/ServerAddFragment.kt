@@ -12,6 +12,7 @@ import androidx.fragment.app.replace
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import org.jellyfin.androidtv.BuildConfig
 import org.jellyfin.androidtv.R
 import org.jellyfin.androidtv.auth.model.ConnectedState
 import org.jellyfin.androidtv.auth.model.ConnectingState
@@ -62,6 +63,7 @@ class ServerAddFragment : Fragment() {
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
+		binding.irohBuildIdentity.text = getString(R.string.iroh_build_identity, BuildConfig.IROH_SOURCE_REVISION)
 
 		if (serverAddressArgument != null) {
 			binding.address.setText(serverAddressArgument)

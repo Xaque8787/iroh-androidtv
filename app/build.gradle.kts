@@ -20,6 +20,8 @@ android {
 		applicationId = "io.github.xaque8787.iroh.androidtv"
 		versionName = project.getVersionName()
 		versionCode = getVersionCode(versionName!!)
+		val sourceRevision = providers.environmentVariable("GITHUB_SHA").orElse("local").get().take(12)
+		buildConfigField("String", "IROH_SOURCE_REVISION", "\"$sourceRevision\"")
 	}
 
 	buildFeatures {

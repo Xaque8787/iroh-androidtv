@@ -24,10 +24,19 @@
         style="@style/TextAppearance.Leanback.Title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/lbl_enter_server_address"
+        android:text="@string/iroh_server_title"
         app:layout_constraintEnd_toStartOf="@id/center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/iroh_build_identity"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toStartOf="@id/center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title" />
 
     <TextView
         android:id="@+id/address_label"
@@ -37,7 +46,7 @@
         android:text="@string/iroh_server_hint"
         app:layout_constraintEnd_toStartOf="@id/center"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title" />
+        app:layout_constraintTop_toBottomOf="@id/iroh_build_identity" />
 
     <EditText
         android:id="@+id/address"

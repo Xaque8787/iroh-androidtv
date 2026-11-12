@@ -105,16 +105,23 @@ class ServerRepositoryImpl(
 	// Mutating data
 	override fun addServer(address: String): Flow<ServerAdditionState> = flow {
 		if (IrohTransport.isInvite(address) || address == IrohTransport.ADDRESS) {
-			emit(ConnectingState("Iroh"))
+			emit(ConnectingState("Iroh (pairing device)"))
+			var stage = "device pairing"
+			var paired = iroh.hasSavedPairing
 			try {
 				check(!IrohTransport.isInvite(address) || authenticationStore.getServers().values.none { it.address == IrohTransport.ADDRESS }) {
 					"Remove the saved Iroh server before pairing another invitation."
 				}
 				if (IrohTransport.isInvite(address)) iroh.pair(address)
+				paired = true
+				stage = "Jellyfin server information"
+				emit(ConnectingState("Iroh (reading Jellyfin server information)"))
 				val api = jellyfin.createApi(IrohTransport.ADDRESS)
 				val info = api.systemApi.getPublicSystemInfo().content
+				stage = "Jellyfin branding"
 				val branding = api.getBrandingOptionsOrDefault()
 				val id = info.id!!.toUUID()
+				stage = "saving server"
 				check(authenticationStore.putServer(id, AuthenticationStoreServer(
 					name = info.serverName ?: "Iroh Jellyfin",
 					address = IrohTransport.ADDRESS,
@@ -130,9 +137,15 @@ class ServerRepositoryImpl(
 				throw error
 			} catch (error: Exception) {
 				val message = when (error) {
-					is IrohException -> "Iroh: ${error.code}. Check the host or obtain a fresh invitation."
+					is IrohException -> "Iroh $stage failed (${error.code}). Check the host or obtain a fresh invitation."
 					is IllegalStateException -> error.message ?: "Iroh connection failed"
-					else -> "Iroh could not reach Jellyfin. Check connectivity; your pairing is retained."
+					else -> {
+						// Exception messages can contain tokens or capability URLs; expose types only.
+						val reason = error.cause?.javaClass?.simpleName ?: error.javaClass.simpleName
+						val recovery = if (paired) "Pairing is saved; use Connect using saved Iroh pairing to retry."
+						else "Check the host and connection, then retry."
+						"Iroh $stage failed ($reason). $recovery"
+					}
 				}
 				emit(IrohConnectionError(message))
 			}

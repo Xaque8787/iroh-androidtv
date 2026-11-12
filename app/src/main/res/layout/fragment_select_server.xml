@@ -54,7 +54,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="@string/connect_manually_by_address" />
+            android:text="@string/iroh_connect_action" />
     </LinearLayout>
 
     <Space

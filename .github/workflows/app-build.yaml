@@ -26,10 +26,24 @@ jobs:
         run: ./gradlew :app:testDebugUnitTest :app:assembleDebug
       - name: Create publish bundle
         run: mkdir -p build/gh-app-publish/; find app/build/ -iname "*.apk" -exec mv "{}" build/gh-app-publish/ \;
+      - name: Record beta build identity
+        env:
+          SOURCE_SHA: ${{ github.sha }}
+          SOURCE_REF: ${{ github.ref }}
+        run: |
+          {
+            echo "Iroh Jellyfin TV beta"
+            echo "Source commit: $SOURCE_SHA"
+            echo "Source ref: $SOURCE_REF"
+            echo "Application ID: io.github.xaque8787.iroh.androidtv.debug"
+            echo "Iroh SDK: 0.4.0"
+            sha256sum build/gh-app-publish/*.apk
+          } > build/gh-app-publish/BUILD-INFO.txt
+          cat build/gh-app-publish/BUILD-INFO.txt >> "$GITHUB_STEP_SUMMARY"
       - name: Upload artifacts
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: iroh-androidtv-debug
+          name: iroh-androidtv-debug-${{ github.sha }}
           retention-days: 14
           if-no-files-found: error
           path: build/gh-app-publish/
