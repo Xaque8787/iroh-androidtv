@@ -3,7 +3,7 @@ package org.jellyfin.androidtv.iroh
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
-import io.github.xaque8787.iroh.IrohClient
+import io.github.xaque8787.kausway.KauswayClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -18,18 +18,18 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 class IrohTransport(private val context: Context) {
 	companion object {
 		const val ADDRESS = "http://iroh.invalid/"
-		fun isInvite(address: String) = address.trim().startsWith("jellyfin-iroh:", ignoreCase = true)
+		fun isInvite(address: String) = address.trim().startsWith("kausway://invite/", ignoreCase = true)
 	}
 
-	val hasSavedPairing: Boolean get() = context.noBackupFilesDir.resolve("iroh-client/host.json").isFile
+	val hasSavedPairing: Boolean get() = context.noBackupFilesDir.resolve("kausway-client/host.json").isFile
 
 	private val mutex = Mutex()
-	private var client: IrohClient? = null
+	private var client: KauswayClient? = null
 	private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-	private suspend fun client(): IrohClient {
+	private suspend fun client(): KauswayClient {
 		client?.let { return it }
-		val initialized = IrohClient.initialize(context.applicationContext)
+		val initialized = KauswayClient.initialize(context.applicationContext)
 		client = initialized
 		val connectivity = context.getSystemService(ConnectivityManager::class.java)
 		connectivity.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {

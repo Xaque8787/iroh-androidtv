@@ -20,18 +20,28 @@ For local builds, install JDK 21 and the Android SDK required by the existing
 Gradle version catalog, then run:
 
 ```sh
-bash scripts/fetch-iroh-sdk.sh
+bash scripts/fetch-kausway-sdk.sh
 ./gradlew :app:testDebugUnitTest :app:assembleDebug
 ```
 
-The script downloads SDK 0.4.0 from `Xaque8787/iroh-jellyfin` release `v0.4.0`,
+The script downloads SDK 0.4.0 from `Xaque8787/Kausway` release `v0.4.0`,
 checks a pinned SHA-256, and puts the AAR in ignored `app/libs`. The consumer uses
 its existing coroutine dependency. To update the SDK, update the version and
 checksum in the script and the file dependency together.
 
+## Kausway SDK
+
+The app now uses the Kausway client SDK and `kausway://invite/` invitations.
+Use a matching Kausway host and a fresh invitation. Pairing from the previous SDK
+is not reused; the SDK now stores data under `kausway-client` in private no-backup
+storage. The APK application ID, launcher name and internal routing classes remain
+those of this Android TV fork; this update changes its transport dependency.
+
+Pinned AAR SHA-256: `54349225b04e397cae6dc83c9b6ff0fa5cd297abf427042ca63a73077516cb09`.
+
 ## Connect
 
-Paste a `jellyfin-iroh://invite/...` link in the existing server field and connect.
+Paste a `kausway://invite/...` link in the existing server field and connect.
 After device pairing, use the normal Jellyfin login or Quick Connect flow. HTTP(S)
 server entries still work normally. The app retains the Iroh identity and pairing
 in app-private no-backup storage; it stores no invite or proxy capability URL.
@@ -105,7 +115,7 @@ The launcher name remains **Iroh Jellyfin TV (debug)**. Build markers show `loca
 when building outside GitHub Actions without `GITHUB_SHA`.
 
 The original Iroh commit `ed2985960` already included the smaller hint
-**HTTP(S) address or jellyfin-iroh://invite/… link** below the generic server title.
+**HTTP(S) address or kausway://invite/… link** below the generic server title.
 No hint and no Iroh launcher label indicate a different/older APK or app. A newer
 build now identifies the failed stage and a safe error type, so record that text
 without sharing the invitation link. A failed connection alone does not establish

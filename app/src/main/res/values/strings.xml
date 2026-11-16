@@ -699,7 +699,7 @@
     <string name="truehd">TrueHD</string>
     <string name="eac3_atmos">DD+ Atmos</string>
     <string name="truehd_atmos">TrueHD Atmos</string>
-    <string name="iroh_server_hint">HTTP(S) address or jellyfin-iroh://invite/… link</string>
+    <string name="iroh_server_hint">HTTP(S) address or kausway://invite/… link</string>
     <string name="iroh_resume">Connect using saved Iroh pairing</string>
     <string name="iroh_server_title">Enter server URL or Iroh invite</string>
     <string name="iroh_connect_action">Connect with server URL or Iroh invite</string>

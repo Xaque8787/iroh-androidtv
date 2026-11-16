@@ -115,7 +115,7 @@ tasks.register("versionTxt") {
 }
 
 dependencies {
-	implementation(files("libs/iroh-client-android-0.4.0.aar"))
+	implementation(files("libs/kausway-client-android-0.4.0.aar"))
 	// Jellyfin
 	implementation(projects.design)
 	implementation(projects.playback.core)

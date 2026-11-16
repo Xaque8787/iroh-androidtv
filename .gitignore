@@ -8,6 +8,6 @@ local.properties
 build/
 captures/
 
-# Downloaded, checksum-pinned Iroh SDK
+# Downloaded, checksum-pinned Kausway SDK
 /app/libs/*.aar
 /app/libs/*.tmp

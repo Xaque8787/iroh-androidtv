@@ -9,6 +9,14 @@ import okhttp3.Request
 import java.net.InetSocketAddress
 
 class IrohHttpRoutingTests : FunSpec({
+	test("server input recognizes Kausway invitations without treating HTTP URLs as pairing links") {
+		IrohTransport.isInvite("kausway://invite/example") shouldBe true
+		IrohTransport.isInvite("  kausway://invite/example  ") shouldBe true
+		IrohTransport.isInvite("http://server.example:8096") shouldBe false
+		IrohTransport.isInvite("https://server.example/kausway://invite/example") shouldBe false
+		IrohTransport.isInvite("jellyfin-iroh://invite/example") shouldBe false
+	}
+
 	test("API headers, encoded paths, redirects, HLS and Range stay inside the capability") {
 		val requests = mutableListOf<String>()
 		val server = HttpServer.create(InetSocketAddress("127.0.0.1", 0), 0)

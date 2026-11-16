@@ -1,6 +1,6 @@
 package org.jellyfin.androidtv.auth.repository
 
-import io.github.xaque8787.iroh.IrohException
+import io.github.xaque8787.kausway.KauswayException
 import java.time.Instant
 import java.util.UUID
 import kotlinx.coroutines.CancellationException
@@ -137,14 +137,14 @@ class ServerRepositoryImpl(
 				throw error
 			} catch (error: Exception) {
 				val message = when (error) {
-					is IrohException -> "Iroh $stage failed (${error.code}). Check the host or obtain a fresh invitation."
+					is KauswayException -> "Kausway $stage failed (${error.code}). Check the host or obtain a fresh invitation."
 					is IllegalStateException -> error.message ?: "Iroh connection failed"
 					else -> {
 						// Exception messages can contain tokens or capability URLs; expose types only.
 						val reason = error.cause?.javaClass?.simpleName ?: error.javaClass.simpleName
 						val recovery = if (paired) "Pairing is saved; use Connect using saved Iroh pairing to retry."
 						else "Check the host and connection, then retry."
-						"Iroh $stage failed ($reason). $recovery"
+						"Kausway $stage failed ($reason). $recovery"
 					}
 				}
 				emit(IrohConnectionError(message))
