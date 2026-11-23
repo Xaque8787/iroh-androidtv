@@ -11,3 +11,5 @@ captures/
 # Downloaded, checksum-pinned Kausway SDK
 /app/libs/*.aar
 /app/libs/*.tmp
+/app/libs/kausway-sdk.properties
+/scripts/__pycache__/

@@ -1,8 +1,20 @@
+import java.util.Properties
+
 plugins {
 	alias(libs.plugins.aboutlibraries)
 	alias(libs.plugins.android.application)
 	alias(libs.plugins.kotlin.compose)
 	alias(libs.plugins.kotlin.serialization)
+}
+
+// Written only after the fetch script has verified the selected release's AAR.
+val kauswaySdkMetadata = layout.projectDirectory.file("libs/kausway-sdk.properties")
+check(kauswaySdkMetadata.asFile.isFile) { "Run bash scripts/fetch-kausway-sdk.sh before building" }
+val kauswaySdkVersion = providers.fileContents(kauswaySdkMetadata).asText.map { text ->
+	Properties().apply { load(text.reader()) }.getProperty("version")
+}.get()
+check(Regex("(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)").matches(kauswaySdkVersion)) {
+	"Invalid Kausway SDK version; rerun bash scripts/fetch-kausway-sdk.sh"
 }
 
 android {
@@ -22,6 +34,7 @@ android {
 		versionCode = getVersionCode(versionName!!)
 		val sourceRevision = providers.environmentVariable("GITHUB_SHA").orElse("local").get().take(12)
 		buildConfigField("String", "IROH_SOURCE_REVISION", "\"$sourceRevision\"")
+		buildConfigField("String", "KAUSWAY_SDK_VERSION", "\"$kauswaySdkVersion\"")
 	}
 
 	buildFeatures {
@@ -115,7 +128,7 @@ tasks.register("versionTxt") {
 }
 
 dependencies {
-	implementation(files("libs/kausway-client-android-0.4.0.aar"))
+	implementation(files("libs/kausway-client-android-$kauswaySdkVersion.aar"))
 	// Jellyfin
 	implementation(projects.design)
 	implementation(projects.playback.core)

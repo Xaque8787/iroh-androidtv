@@ -49,11 +49,30 @@ development and building. For manual building without Android Studio make sure a
 PATH, then use the Gradle wrapper (`./gradlew`) to build the project with the `assembleDebug` Gradle task to generate an apk file:
 
 ```shell
+bash scripts/fetch-kausway-sdk.sh
 ./gradlew assembleDebug
 ```
 
 The task will create an APK file in the `/app/build/outputs/apk/debug` directory. This APK file uses a different app-id from our stable
 builds and can be manually installed to your device.
+
+This fork uses the newest published stable **Client** SDK from
+[Kausway Releases](https://github.com/Xaque8787/Kausway/releases), selected by the
+`client-v<version>` tag rather than the repository-wide latest suite release.
+The fetch script requires Python 3.9+ and verifies the AAR against its published
+SHA-256 file. Gradle and the app's SDK label read the resulting local metadata;
+old AARs in `app/libs` are not selected automatically.
+
+To reproduce a particular SDK build, use
+`KAUSWAY_SDK_VERSION=0.5.0 bash scripts/fetch-kausway-sdk.sh` before Gradle.
+For GitHub builds, open **Actions → App / Build → Run workflow**, select the branch,
+and leave `kausway_sdk_version` as `latest` or enter an exact stable version.
+The artifact includes `BUILD-INFO.txt` and `KAUSWAY-SDK.properties` with the selected
+release and checksum. Rerunning with `latest` can select a newer SDK even for the
+same app commit; use the recorded exact version to reproduce it. Publishing a
+Kausway SDK does not itself trigger a TV app build.
+GitHub Actions uses its built-in token for release discovery; no custom SDK secret
+is required. For local builds, `GH_TOKEN` is optional and can raise the API rate limit.
 
 ## Branching
 

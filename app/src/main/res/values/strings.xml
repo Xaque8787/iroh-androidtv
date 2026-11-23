@@ -703,5 +703,5 @@
     <string name="iroh_resume">Connect using saved Iroh pairing</string>
     <string name="iroh_server_title">Enter server URL or Iroh invite</string>
     <string name="iroh_connect_action">Connect with server URL or Iroh invite</string>
-    <string name="iroh_build_identity">Iroh beta · SDK 0.4.0 · build %1$s</string>
+    <string name="iroh_build_identity">Iroh beta · SDK %1$s · build %2$s</string>
 </resources>

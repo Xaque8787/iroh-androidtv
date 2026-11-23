@@ -63,7 +63,11 @@ class ServerAddFragment : Fragment() {
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
-		binding.irohBuildIdentity.text = getString(R.string.iroh_build_identity, BuildConfig.IROH_SOURCE_REVISION)
+		binding.irohBuildIdentity.text = getString(
+			R.string.iroh_build_identity,
+			BuildConfig.KAUSWAY_SDK_VERSION,
+			BuildConfig.IROH_SOURCE_REVISION,
+		)
 
 		if (serverAddressArgument != null) {
 			binding.address.setText(serverAddressArgument)
