@@ -74,6 +74,31 @@ Kausway SDK does not itself trigger a TV app build.
 GitHub Actions uses its built-in token for release discovery; no custom SDK secret
 is required. For local builds, `GH_TOKEN` is optional and can raise the API rate limit.
 
+## Connecting with Kausway
+
+The server connection field accepts a normal HTTP(S) server address, a full
+`kausway://invite/...` invitation, or a `K1-XXXXXX-XXXXXX-XXXXXX` short code.
+Codes also accept lowercase, compact and space-separated forms. The original
+input goes to the Kausway SDK, which handles validation, discovery and pairing.
+
+Short-code pairing requires a host and Client SDK release containing rendezvous
+support. The original published `0.5.0` SDK predates this feature. After the new
+Client release is published in Kausway, manually run **App / Build** against
+`master` with `kausway_sdk_version=latest`. Confirm the selected SDK version in
+the workflow summary and downloaded APK artifact's `BUILD-INFO.txt`.
+
+In the host's admin UI, create an invitation with **Also generate a short code**
+selected and wait for publication acknowledgment before entering the code here.
+Default code discovery needs outbound IPv4 UDP on both devices. A full invitation
+URL can be used without code discovery. Either input consumes the same single-use
+invitation, so create a new invitation for another test or device.
+
+Once paired, use the saved server or **Connect using saved Iroh pairing** to
+reconnect without entering another code. Remove the saved Iroh server before
+pairing another host. Check a real TV installation for code pairing, full-URL
+pairing, login/playback and reconnection; JVM tests cover input routing and proxy
+HTTP behavior, not native discovery or device networking.
+
 ## Branching
 
 The `master` branch is the primary development branch and the target for all pull requests. It is **unstable** and may contain breaking

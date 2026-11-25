@@ -699,9 +699,9 @@
     <string name="truehd">TrueHD</string>
     <string name="eac3_atmos">DD+ Atmos</string>
     <string name="truehd_atmos">TrueHD Atmos</string>
-    <string name="iroh_server_hint">HTTP(S) address or kausway://invite/… link</string>
+    <string name="iroh_server_hint">HTTP(S) address, kausway://invite/… link or K1-XXXXXX-XXXXXX-XXXXXX code</string>
     <string name="iroh_resume">Connect using saved Iroh pairing</string>
-    <string name="iroh_server_title">Enter server URL or Iroh invite</string>
-    <string name="iroh_connect_action">Connect with server URL or Iroh invite</string>
+    <string name="iroh_server_title">Enter server URL, invite or short code</string>
+    <string name="iroh_connect_action">Connect with server URL, invite or short code</string>
     <string name="iroh_build_identity">Iroh beta · SDK %1$s · build %2$s</string>
 </resources>

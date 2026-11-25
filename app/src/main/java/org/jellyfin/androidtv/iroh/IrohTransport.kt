@@ -18,7 +18,20 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 class IrohTransport(private val context: Context) {
 	companion object {
 		const val ADDRESS = "http://iroh.invalid/"
-		fun isInvite(address: String) = address.trim().startsWith("kausway://invite/", ignoreCase = true)
+		private const val MAX_CODE_INPUT_LENGTH = 64
+		private val compactShortCodeCandidate = Regex("K1[0-9A-Z]*", RegexOption.IGNORE_CASE)
+
+		fun isPairingInput(address: String): Boolean {
+			val input = address.trim()
+			if (input.startsWith("kausway://invite/", ignoreCase = true)) return true
+			// Route incomplete/mistyped formatted codes to SDK validation, not HTTP discovery
+			// where the input could appear in server URLs, error text or logs.
+			if (input.startsWith("K1-", ignoreCase = true) || input.startsWith("K1 ", ignoreCase = true)) return true
+			if (input.length > MAX_CODE_INPUT_LENGTH) return false
+			// Recognize compact, spaced and lowercase forms too. Only classify here:
+			// the SDK validates/normalizes the original input and resolves the invitation.
+			return compactShortCodeCandidate.matches(input.replace(" ", "").replace("-", ""))
+		}
 	}
 
 	val hasSavedPairing: Boolean get() = context.noBackupFilesDir.resolve("kausway-client/host.json").isFile

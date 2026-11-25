@@ -104,15 +104,18 @@ class ServerRepositoryImpl(
 
 	// Mutating data
 	override fun addServer(address: String): Flow<ServerAdditionState> = flow {
-		if (IrohTransport.isInvite(address) || address == IrohTransport.ADDRESS) {
-			emit(ConnectingState("Iroh (pairing device)"))
+		val pairingInput = IrohTransport.isPairingInput(address)
+		if (pairingInput || address == IrohTransport.ADDRESS) {
+			val connectionLabel = if (pairingInput) "Iroh (resolving invitation and pairing device)"
+			else "Iroh (connecting paired device)"
+			emit(ConnectingState(connectionLabel))
 			var stage = "device pairing"
 			var paired = iroh.hasSavedPairing
 			try {
-				check(!IrohTransport.isInvite(address) || authenticationStore.getServers().values.none { it.address == IrohTransport.ADDRESS }) {
+				check(!pairingInput || authenticationStore.getServers().values.none { it.address == IrohTransport.ADDRESS }) {
 					"Remove the saved Iroh server before pairing another invitation."
 				}
-				if (IrohTransport.isInvite(address)) iroh.pair(address)
+				if (pairingInput) iroh.pair(address)
 				paired = true
 				stage = "Jellyfin server information"
 				emit(ConnectingState("Iroh (reading Jellyfin server information)"))
